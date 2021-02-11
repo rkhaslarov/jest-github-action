@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mattallty/jest-github-action.git"
+    "url": "git+https://github.com/willcaul/jest-github-action.git"
   },
   "keywords": [
     "GitHub",
@@ -22,12 +22,12 @@
     "Jest",
     "Pull request"
   ],
-  "author": "Matthias Etienne <matthias@etienne.in>",
+  "author": "Will Caulfield <willcaul@outlook.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mattallty/jest-github-action/issues"
+    "url": "https://github.com/willcaul/jest-github-action/issues"
   },
-  "homepage": "https://github.com/mattallty/jest-github-action#readme",
+  "homepage": "https://github.com/willcaul/jest-github-action",
   "jest": {
     "clearMocks": true,
     "moduleFileExtensions": [
@@ -44,15 +44,15 @@
     "verbose": true
   },
   "dependencies": {
-    "@actions/core": "^1.1.1",
-    "@actions/exec": "^1.0.3",
-    "@actions/github": "^2.1.1",
+    "@actions/core": "^1.2.6",
+    "@actions/exec": "^1.0.4",
+    "@actions/github": "^4.0.0",
     "lodash": "^4.17.15",
     "markdown-table": "^2.0.0",
     "strip-ansi": "^6.0.0"
   },
   "devDependencies": {
-    "@octokit/types": "^2.11.1",
+    "@octokit/plugin-rest-endpoint-methods": "^4.10.3",
     "@types/jest": "^25.2.1",
     "@types/lodash": "^4.14.150",
     "@types/markdown-table": "^2.0.0",

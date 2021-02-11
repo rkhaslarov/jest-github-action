@@ -7,18 +7,20 @@ Main features:
 
 ## Coverage example
 
-![Coverage](assets/coverage.png)
+![Coverage Summary](assets/coverage-summary.png)
+
+![Coverage Details](assets/coverage-details.png)
 
 ## Check annotations example
 
-![Fail](assets/fail.png)
+![Test Failure](assets/annotation.png)
 
 ## Usage
 
 You can now consume the action by referencing the v1 branch
 
 ```yaml
-uses: mattallty/jest-github-action@v1
+uses: willcaul/jest-github-action@v1
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -29,7 +31,7 @@ By default, this action will execute `npm test` to run your tests.
 You can change this behavior by providing a custom `test-command` like this:
 
 ```yaml
-uses: mattallty/jest-github-action@v1
+uses: willcaul/jest-github-action@v1
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 with:
@@ -40,7 +42,7 @@ with:
 ### Running tests only on changed files
 
 ```yaml
-uses: mattallty/jest-github-action@v1
+uses: willcaul/jest-github-action@v1
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 with:
@@ -52,7 +54,7 @@ with:
 ### Silencing the code coverage comment
 
 ```yaml
-uses: mattallty/jest-github-action@v1
+uses: willcaul/jest-github-action@v1
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 with:
@@ -65,7 +67,7 @@ with:
 For running tests in folders other than root, supply a working-directory.
 
 ```yaml
-uses: mattallty/jest-github-action@v1
+uses: willcaul/jest-github-action@v1
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 with:
@@ -73,4 +75,6 @@ with:
 ```
 
 
-See the [actions tab](https://github.com/mattallty/jest-github-action/actions) for runs of this action! :rocket:
+## Credits
+
+Thanks to [mattallty/jest-github-action](https://github.com/mattallty/jest-github-action), which this package is forked from, as well as [FirmNav/jest-code-coverage-commenter](https://github.com/FirmNav/jest-code-coverage-commenter), which was used as a reference for the coverage comment format.
