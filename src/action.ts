@@ -6,13 +6,13 @@ import { getOctokit, context } from "@actions/github"
 import type { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods"
 import flatMap from "lodash/flatMap"
 import filter from "lodash/filter"
-import map from "lodash/map"
 import strip from "strip-ansi"
 import { createCoverageMap, CoverageMapData, CoverageSummary } from "istanbul-lib-coverage"
 import type { FormattedTestResults } from "@jest/test-result/build/types"
 
 const ACTION_NAME = "jest-github-action"
 const COVERAGE_HEADER = "# :open_umbrella: Code Coverage";
+const CHAR_LIMIT = 60000;
 
 const rootPath = process.cwd();
 
@@ -66,7 +66,7 @@ export async function run() {
     }
   } catch (error) {
     console.error(error)
-    core.setFailed(error.message)
+    core.setFailed(error instanceof Error ? error.message : String(error))
   }
 }
 
@@ -153,6 +153,17 @@ function truncateLeft(str: string, len: number): string
     return `...${subStr}`;
 }
 
+function truncateRight(str: string, len: number): string
+{
+    if(len > str.length) {
+        return str;
+    }
+
+    const subStr = str.substring(0, len);
+
+    return `${subStr}...`;
+}
+
 export function getCoverageTable(
   results: FormattedTestResults,
   cwd: string,
@@ -221,7 +232,7 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, {out, err}:
     conclusion: results.success ? "success" : "failure",
     output: {
       title: results.success ? "Jest tests passed" : "Jest tests failed",
-      text: `${out ? out : ''}${err ? `\n\n${err}` : ''}`,
+      text: truncateRight(`${out ? out : ''}${err ? `\n\n${err}` : ''}`, CHAR_LIMIT),
       summary: results.success
         ? `${results.numPassedTests} tests passing in ${
             results.numPassedTestSuites

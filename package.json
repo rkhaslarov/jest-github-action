@@ -1,6 +1,6 @@
 {
   "name": "jest-github-action",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Jest action adding checks to your pull requests",
   "main": "lib/run.js",
   "scripts": {
