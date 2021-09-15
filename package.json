@@ -1,8 +1,9 @@
 {
   "name": "jest-github-action",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Jest action adding checks to your pull requests",
-  "main": "lib/run.js",
+  "main": "dist/index.js",
+  "files": ["dist"],
   "scripts": {
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint --fix src/**/*.ts",
