@@ -49,7 +49,7 @@ export async function run() {
 
     // Checks
     const checkPayload = getCheckPayload(results, CWD, std)
-    await octokit.checks.create(checkPayload)
+    await octokit.rest.checks.create(checkPayload)
 
     // Coverage comments
     if (getPullId() && shouldCommentCoverage()) {
@@ -57,7 +57,7 @@ export async function run() {
       if (comment) {
         await deletePreviousComments(octokit)
         const commentPayload = getCommentPayload(comment)
-        await octokit.issues.createComment(commentPayload)
+        await octokit.rest.issues.createComment(commentPayload)
       }
     }
 
@@ -71,7 +71,7 @@ export async function run() {
 }
 
 async function deletePreviousComments(octokit: ReturnType<typeof getOctokit>) {
-  const { data } = await octokit.issues.listComments({
+  const { data } = await octokit.rest.issues.listComments({
     ...context.repo,
     per_page: 100,
     issue_number: getPullId(),
@@ -82,7 +82,7 @@ async function deletePreviousComments(octokit: ReturnType<typeof getOctokit>) {
         (c) =>
           c.user?.login === "github-actions[bot]" && c.body?.startsWith(COVERAGE_HEADER),
       )
-      .map((c) => octokit.issues.deleteComment({ ...context.repo, comment_id: c.id })),
+      .map((c) => octokit.rest.issues.deleteComment({ ...context.repo, comment_id: c.id })),
   )
 }
 
