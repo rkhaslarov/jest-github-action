@@ -30,11 +30,10 @@ export async function run() {
   const RESULTS_FILE = join(CWD, "report.json")
 
   try {
-    const token = process.env.GITHUB_TOKEN
-    if (token === undefined) {
-      core.error("GITHUB_TOKEN not set.")
-      core.setFailed("GITHUB_TOKEN not set.")
-      return
+    const token = getToken()
+
+    if (!token) {
+      return core.setFailed("github-token is not set.")
     }
 
     const cmd = getJestCommand()
@@ -95,8 +94,8 @@ function shouldCommentCoverage(): boolean {
   return Boolean(JSON.parse(core.getInput("coverage-comment", { required: false })))
 }
 
-function shouldRunOnlyChangedFiles(): boolean {
-  return Boolean(JSON.parse(core.getInput("changes-only", { required: false })))
+function getToken(): string {
+  return core.getInput("github-token", { required: true })
 }
 
 function formatIfPoor(number: number): string {
