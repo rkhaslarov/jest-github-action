@@ -37,7 +37,7 @@ export async function run() {
       return
     }
 
-    const cmd = getJestCommand()
+    const cmd = getJestCommand(RESULTS_FILE)
     const std = await execJest(cmd, CWD)
 
     // octokit
@@ -250,8 +250,11 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, {out, err}:
   return payload
 }
 
-function getJestCommand() {
-  return core.getInput("test-command", { required: false })
+function getJestCommand(resultsFile: string) {
+  const cmd = core.getInput("test-command", { required: false })
+  const jestOptions = `--testLocationInResults --json --outputFile=${resultsFile}`
+  const shouldAddHyphen = cmd.startsWith("npm") || cmd.startsWith("npx") || cmd.startsWith("pnpm") || cmd.startsWith("pnpx")
+  return `${cmd}${shouldAddHyphen ? " -- " : " "}${jestOptions}`
 }
 
 function parseResults(resultsFile: string): FormattedTestResults | null {
