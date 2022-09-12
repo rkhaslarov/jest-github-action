@@ -37,7 +37,8 @@ export async function run() {
       return
     }
 
-    const std = await execJest(getJestCommand(), CWD)
+    const cmd = getJestCommand()
+    const std = await execJest(cmd, CWD)
 
     // octokit
     const octokit = getOctokit(token)
@@ -250,7 +251,7 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, {out, err}:
 }
 
 function getJestCommand() {
-  return core.getInput("test-command", { required: true })
+  return core.getInput("test-command", { required: false })
 }
 
 function parseResults(resultsFile: string): FormattedTestResults | null {
