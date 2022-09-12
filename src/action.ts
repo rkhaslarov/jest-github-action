@@ -269,7 +269,6 @@ async function execJest(cmd: string, cwd?: string) {
   try {
     const options: Parameters<typeof exec>[2] = {
       cwd,
-      silent: true
     };
     options.listeners = {
       stdout: (data: Buffer) => {
