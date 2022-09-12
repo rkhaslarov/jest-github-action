@@ -27,7 +27,7 @@ export async function run() {
   let workingDirectory = core.getInput("working-directory", { required: false })
   let cwd = workingDirectory ? resolve(workingDirectory) : process.cwd()
   const CWD = cwd + sep
-  const RESULTS_FILE = join(CWD, "jest.results.json")
+  const RESULTS_FILE = join(CWD, "report.json")
 
   try {
     const token = process.env.GITHUB_TOKEN
@@ -37,15 +37,19 @@ export async function run() {
       return
     }
 
-    const cmd = getJestCommand(RESULTS_FILE)
-
-    const std = await execJest(cmd, CWD)
+    const std = await execJest(getJestCommand(), CWD)
 
     // octokit
     const octokit = getOctokit(token)
 
     // Parse results
     const results = parseResults(RESULTS_FILE)
+
+    // Finish successfully if there is no report
+    if (!results) {
+      console.error("There is no report.json file, finish gracefully.")
+      return;
+    }
 
     // Checks
     const checkPayload = getCheckPayload(results, CWD, std)
@@ -61,7 +65,7 @@ export async function run() {
       }
     }
 
-    if (!results.success) {
+    if (!results?.success) {
       core.setFailed("Some jest tests failed.")
     }
   } catch (error) {
@@ -245,22 +249,16 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, {out, err}:
   return payload
 }
 
-function getJestCommand(resultsFile: string) {
-  let cmd = core.getInput("test-command", { required: false })
-  const jestOptions = `--testLocationInResults --json ${
-    shouldCommentCoverage() ? "--coverage" : ""
-  } ${
-    shouldRunOnlyChangedFiles() && context.payload.pull_request?.base.ref
-      ? "--changedSince=" + context.payload.pull_request?.base.ref
-      : ""
-  } --outputFile=${resultsFile}`
-  const shouldAddHyphen = cmd.startsWith("npm") || cmd.startsWith("npx") || cmd.startsWith("pnpm") || cmd.startsWith("pnpx")
-  cmd += (shouldAddHyphen ? " -- " : " ") + jestOptions
-  return cmd
+function getJestCommand() {
+  return core.getInput("test-command", { required: true })
 }
 
-function parseResults(resultsFile: string): FormattedTestResults {
-  return JSON.parse(readFileSync(resultsFile, "utf-8"))
+function parseResults(resultsFile: string): FormattedTestResults | null {
+  try {
+    return JSON.parse(readFileSync(resultsFile, "utf-8"))
+  } catch(e) {
+    return null
+  }
 }
 
 async function execJest(cmd: string, cwd?: string) {
