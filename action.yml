@@ -16,10 +16,9 @@ inputs:
     description: "Comment PRs with code coverage"
     required: false
     default: "true"
-  changes-only:
-    description: "Only run tests on changed files (over base branch)"
-    required: false
-    default: "false"
+  github-token:
+    description: "Github token for running the action"
+    required: true
 
 runs:
   using: "node16"
