@@ -56,7 +56,7 @@ export async function run() {
 
     // Coverage comments
     if (getPullId() && shouldCommentCoverage()) {
-      const comment = getCoverageTable(results, CWD)
+      const comment = getCoverageTable(results)
       if (comment) {
         await deletePreviousComments(octokit)
         const commentPayload = getCommentPayload(comment)
@@ -169,9 +169,8 @@ function truncateRight(str: string, len: number): string
 
 export function getCoverageTable(
   results: FormattedTestResults,
-  cwd: string,
 ): string | false {
-  if (!results.coverageMap) {
+  if (!results.coverageMap || results?.testResults?.length) {
     return ""
   }
   const covMap = createCoverageMap((results.coverageMap as unknown) as CoverageMapData)
@@ -193,7 +192,7 @@ export function getCoverageTable(
     return { relative, fileName, path: p, coverage };
   };
   const fullHeaders = ["File", ...headers];
-  const files = covMap.files().map(parseFile).reduce(groupByPath, {});
+  const files = results.testResults.map(result => result.name).map(parseFile).reduce(groupByPath, {});
   const rows = Object.entries(files)
         .map(([dir, files]) => [
             [`<b>${truncateLeft(dir, 50)}</b>`, "", "", "", ""], // Add metrics for directories by summing files
