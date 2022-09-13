@@ -170,7 +170,7 @@ function truncateRight(str: string, len: number): string
 export function getCoverageTable(
   results: FormattedTestResults,
 ): string | false {
-  if (!results.coverageMap || !results?.testResults?.length) {
+  if (!results.coverageMap) {
     return ""
   }
   const covMap = createCoverageMap((results.coverageMap as unknown) as CoverageMapData)
@@ -192,7 +192,7 @@ export function getCoverageTable(
     return { relative, fileName, path: p, coverage };
   };
   const fullHeaders = ["File", ...headers];
-  const files = results.testResults.map(result => result.name).map(parseFile).reduce(groupByPath, {});
+  const files = covMap.files().map(parseFile).reduce(groupByPath, {});
   const rows = Object.entries(files)
         .map(([dir, files]) => [
             [`<b>${truncateLeft(dir, 50)}</b>`, "", "", "", ""], // Add metrics for directories by summing files
