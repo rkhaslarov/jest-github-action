@@ -170,7 +170,7 @@ function truncateRight(str: string, len: number): string
 export function getCoverageTable(
   results: FormattedTestResults,
 ): string | false {
-  if (!results.coverageMap || results?.testResults?.length) {
+  if (!results.coverageMap || !results?.testResults?.length) {
     return ""
   }
   const covMap = createCoverageMap((results.coverageMap as unknown) as CoverageMapData)
