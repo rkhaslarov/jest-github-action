@@ -4,10 +4,13 @@ branding:
   icon: "check"
   color: "green"
 inputs:
-  test-command:
-    description: "The test command to run"
-    required: false
-    default: "npm test"
+  report-file:
+    description: "Report file that should be shown"
+    required: true
+    default: "report.json"
+  github-token:
+    description: "Github token for running the action"
+    required: true
   working-directory:
     description: "Subdirectory to run tests in"
     required: false
@@ -16,9 +19,7 @@ inputs:
     description: "Comment PRs with code coverage"
     required: false
     default: "true"
-  github-token:
-    description: "Github token for running the action"
-    required: true
+
 
 runs:
   using: "node16"

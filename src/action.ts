@@ -24,10 +24,10 @@ type File = {
 };
 
 export async function run() {
-  let workingDirectory = core.getInput("working-directory", { required: false })
-  let cwd = workingDirectory ? resolve(workingDirectory) : process.cwd()
-  const CWD = cwd + sep
-  const RESULTS_FILE = join(CWD, "report.json")
+  const workingDirectory = core.getInput("working-directory", { required: false })
+  const reportFile = core.getInput("report-file", { required: false })
+  const CWD = `${workingDirectory ? resolve(workingDirectory) : process.cwd()}${sep}`
+  const RESULTS_FILE = join(CWD, reportFile)
 
   try {
     const token = getToken()
@@ -36,8 +36,7 @@ export async function run() {
       return core.setFailed("github-token is not set.")
     }
 
-    const cmd = getJestCommand()
-    const std = await execJest(cmd, CWD)
+    // const std = await execJest(cmd, CWD)
 
     // octokit
     const octokit = getOctokit(token)
@@ -52,7 +51,7 @@ export async function run() {
     }
 
     // Checks
-    const checkPayload = getCheckPayload(results, CWD, std)
+    const checkPayload = getCheckPayload(results, CWD)
     await octokit.rest.checks.create(checkPayload)
 
     // Coverage comments
@@ -227,7 +226,7 @@ function getCommentPayload(body: string) {
   return payload
 }
 
-function getCheckPayload(results: FormattedTestResults, cwd: string, {out, err}: {out?: string, err?: string}) {
+function getCheckPayload(results: FormattedTestResults, cwd: string) {
   const payload: RestEndpointMethodTypes["checks"]["create"]["parameters"] = {
     ...context.repo,
     head_sha: getSha(),
@@ -236,7 +235,7 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, {out, err}:
     conclusion: results.success ? "success" : "failure",
     output: {
       title: results.success ? "Jest tests passed" : "Jest tests failed",
-      text: truncateRight(`${out ? out : ''}${err ? `\n\n${err}` : ''}`, CHAR_LIMIT),
+      // text: truncateRight(`${out ? out : ''}${err ? `\n\n${err}` : ''}`, CHAR_LIMIT),
       summary: results.success
         ? `${results.numPassedTests} tests passing in ${
             results.numPassedTestSuites
@@ -249,10 +248,6 @@ function getCheckPayload(results: FormattedTestResults, cwd: string, {out, err}:
   return payload
 }
 
-function getJestCommand() {
-  return core.getInput("test-command", { required: false })
-}
-
 function parseResults(resultsFile: string): FormattedTestResults | null {
   try {
     return JSON.parse(readFileSync(resultsFile, "utf-8"))
@@ -261,32 +256,32 @@ function parseResults(resultsFile: string): FormattedTestResults | null {
   }
 }
 
-async function execJest(cmd: string, cwd?: string) {
-  let out = Buffer.concat([], 0)
-  let err = Buffer.concat([], 0)
+// async function execJest(cmd: string, cwd?: string) {
+//   let out = Buffer.concat([], 0)
+//   let err = Buffer.concat([], 0)
 
-  try {
-    const options: Parameters<typeof exec>[2] = {
-      cwd,
-    };
-    options.listeners = {
-      stdout: (data: Buffer) => {
-        out = Buffer.concat([out, data], out.length + data.length)
-      },
-      stderr: (data: Buffer) => {
-        err = Buffer.concat([err, data], err.length + data.length)
-      }
-    };
-    await exec(cmd, [], options)
+//   try {
+//     const options: Parameters<typeof exec>[2] = {
+//       cwd,
+//     };
+//     options.listeners = {
+//       stdout: (data: Buffer) => {
+//         out = Buffer.concat([out, data], out.length + data.length)
+//       },
+//       stderr: (data: Buffer) => {
+//         err = Buffer.concat([err, data], err.length + data.length)
+//       }
+//     };
+//     await exec(cmd, [], options)
 
 
-    console.debug("Jest command executed")
-  } catch (e) {
-    console.error("Jest execution failed. Tests have likely failed.", e)
-  }
+//     console.debug("Jest command executed")
+//   } catch (e) {
+//     console.error("Jest execution failed. Tests have likely failed.", e)
+//   }
 
-  return { out: out.toString(), err: err.toString() };
-}
+//   return { out: out.toString(), err: err.toString() };
+// }
 
 function getPullId(): number {
   return context.payload.pull_request?.number ?? 0
